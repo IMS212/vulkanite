@@ -8,15 +8,13 @@ import me.cortex.vulkanite.lib.base.initalizer.VInitializer;
 import me.cortex.vulkanite.mixin.MixinRenderSection;
 import me.jellysquid.mods.sodium.client.render.chunk.RenderSection;
 import me.jellysquid.mods.sodium.client.render.chunk.compile.ChunkBuildOutput;
-import org.lwjgl.vulkan.VkPhysicalDeviceAccelerationStructureFeaturesKHR;
-import org.lwjgl.vulkan.VkPhysicalDeviceBufferDeviceAddressFeaturesKHR;
-import org.lwjgl.vulkan.VkPhysicalDeviceRayQueryFeaturesKHR;
-import org.lwjgl.vulkan.VkPhysicalDeviceRayTracingPipelineFeaturesKHR;
+import org.lwjgl.vulkan.*;
 
 import java.util.List;
 
 import static org.lwjgl.vulkan.EXTDebugUtils.VK_EXT_DEBUG_UTILS_EXTENSION_NAME;
 import static org.lwjgl.vulkan.EXTDescriptorIndexing.VK_EXT_DESCRIPTOR_INDEXING_EXTENSION_NAME;
+import static org.lwjgl.vulkan.EXTHdrMetadata.VK_EXT_HDR_METADATA_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRAccelerationStructure.VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRBufferDeviceAddress.VK_KHR_BUFFER_DEVICE_ADDRESS_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRDeferredHostOperations.VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME;
@@ -34,6 +32,9 @@ import static org.lwjgl.vulkan.KHRRayQuery.VK_KHR_RAY_QUERY_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRRayTracingPipeline.VK_KHR_RAY_TRACING_PIPELINE_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRShaderDrawParameters.VK_KHR_SHADER_DRAW_PARAMETERS_EXTENSION_NAME;
 import static org.lwjgl.vulkan.KHRSpirv14.VK_KHR_SPIRV_1_4_EXTENSION_NAME;
+import static org.lwjgl.vulkan.KHRSurface.VK_KHR_SURFACE_EXTENSION_NAME;
+import static org.lwjgl.vulkan.KHRSwapchain.VK_KHR_SWAPCHAIN_EXTENSION_NAME;
+import static org.lwjgl.vulkan.KHRWin32Surface.VK_KHR_WIN32_SURFACE_EXTENSION_NAME;
 
 public class Vulkanite {
     public static boolean IS_ENABLED = true;
@@ -78,7 +79,9 @@ public class Vulkanite {
 
     private static VContext createVulkanContext() {
         var init = new VInitializer("Vulkan test", "Vulkanite", 1, 3,
-                new String[]{VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
+                new String[]{
+                        VK_KHR_SURFACE_EXTENSION_NAME,
+                        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME,
                         VK_KHR_EXTERNAL_MEMORY_CAPABILITIES_EXTENSION_NAME,
                         VK_KHR_EXTERNAL_SEMAPHORE_CAPABILITIES_EXTENSION_NAME,
                         VK_KHR_EXTERNAL_FENCE_CAPABILITIES_EXTENSION_NAME,
@@ -92,6 +95,8 @@ public class Vulkanite {
         init.findPhysicalDevice();//glGetString(GL_RENDERER).split("/")[0]
 
         init.createDevice(List.of(
+                        VK_EXT_HDR_METADATA_EXTENSION_NAME,
+                        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
                         VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
                         VK_KHR_EXTERNAL_SEMAPHORE_WIN32_EXTENSION_NAME,
                         VK_KHR_EXTERNAL_FENCE_WIN32_EXTENSION_NAME,
@@ -115,6 +120,9 @@ public class Vulkanite {
                         stack-> VkPhysicalDeviceBufferDeviceAddressFeaturesKHR.calloc(stack)
                                 .sType$Default()
                                 .bufferDeviceAddress(true),
+                        stack-> VkPhysicalDeviceSynchronization2FeaturesKHR.calloc(stack)
+                                .sType$Default()
+                                .synchronization2(true),
 
                         stack-> VkPhysicalDeviceAccelerationStructureFeaturesKHR.calloc(stack)
                                 .sType$Default()
@@ -133,4 +141,7 @@ public class Vulkanite {
         return init.createContext();
     }
 
+    public void renderTickAfter() {
+        ctx.drawFrame();
+    }
 }

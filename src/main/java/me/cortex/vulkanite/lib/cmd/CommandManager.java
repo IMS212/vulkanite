@@ -16,7 +16,7 @@ import static org.lwjgl.vulkan.VK10.*;
 //Manages multiple command queues and fence synchronizations
 public class CommandManager {
     private final VkDevice device;
-    private final VkQueue[] queues;
+    public final VkQueue[] queues;
 
     public CommandManager(VkDevice device, int queues) {
         this.device = device;

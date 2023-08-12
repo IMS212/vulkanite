@@ -139,6 +139,6 @@ public class VInitializer {
 
     public VContext createContext() {
         //TODO:FIXME: DONT HARDCODE THE FACT IT HAS DEVICE ADDRESSES
-        return new VContext(device, queueCount, true);
+        return new VContext(instance, device, queueCount, true);
     }
 }
